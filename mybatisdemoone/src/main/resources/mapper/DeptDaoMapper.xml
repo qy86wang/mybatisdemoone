@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mb.dao.DeptDao">
+    <!--部门列表  select  查询标签 id和接口中的方法名称对象相同 parameterType方法的参数 resultType返回值类型-->
+    <select id="getList" resultType="com.aaa.mb.entity.Dept" >
+        select deptno as deptNo,dname,loc from dept
+
+    </select>
+    <!--部门添加 -->
+    <insert id="add" parameterType="com.aaa.mb.entity.Dept" >
+        <!-- 序列的使用 现在数据库创建序列  然后在需要使用的序列的列加上 序列名称.Nextval-->
+        <!-- -->
+        INSERT INTO dept VALUES(SEQ_DEPT_ID.Nextval,#{dname,jdbcType=VARCHAR},#{loc})
+    </insert>
+
+    <!--根据部门编号查询部门信息-->
+    <select id="getById" parameterType="int" resultType="com.aaa.mb.entity.Dept">
+        select deptno as deptNo,dname,loc from dept where deptno=#{deptNo}
+    </select>
+
+    <!-- 修改更新-->
+    <update id="update" parameterType="com.aaa.mb.entity.Dept">
+        update dept set dname=#{dname},loc=#{loc} where deptno=#{deptNo}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        delete from dept where deptno=#{deptId}
+    </delete>
+
+    <!-- 高级映射   一对多-->
+    <select id="oneToMany" resultMap="deptAnEmps">
+        select d.deptno as dno, d.dname,d.loc,e.empno,e.ename,e.sal,e.comm,e.job from dept d left join emp e on d.deptno=e.deptno
+    </select>
+
+    <!-- 一对多的  映射配置-->
+    <resultMap id="deptAnEmps" type="dept">
+        <!--javaType="int" 实体类里面的属性类型-->
+        <id column="dno" property="deptNo" javaType="int" jdbcType="INTEGER"></id>
+        <result column="dname" property="dname"></result>
+        <result  column="loc" property="loc"></result>
+        <collection property="empList" ofType="emp">
+            <id column="empno" property="empNo"></id>
+            <result column="sal" property="salary"></result>
+            <result column="comm" property="comm"></result>
+            <result column="job" property="job"></result>
+            <result column="ename" property="ename"></result>
+
+        </collection>
+    </resultMap>
+</mapper>
